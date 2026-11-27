@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RRFS Social</title>
+<style>
+:root{--fundo:#0e1418;--painel:#161e24;--campo:#0f161b;--tinta:#e4eaee;--suave:#8a9aa6;--linha:#26323b;--cor:#3aa6d8;--cor-t:#06151d;--erro:#f2877f}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--fundo);color:var(--tinta);font:15px/1.5 system-ui,"Segoe UI",sans-serif}
+main{width:min(26rem,92vw)}
+h1{font:600 2rem Georgia,serif;margin:0 0 .2rem}
+.sub{color:var(--suave);margin:0 0 1.2rem}
+.caixa{background:var(--painel);border:1px solid var(--linha);border-radius:8px;padding:1.2rem}
+label{display:block;font-size:.85rem;color:var(--suave);margin:.8rem 0 .25rem}
+input,select{width:100%;padding:.6rem .7rem;background:var(--campo);color:inherit;border:1px solid var(--linha);border-radius:6px;font:inherit}
+button{width:100%;margin-top:1rem;padding:.65rem;border:0;border-radius:6px;background:var(--cor);color:var(--cor-t);font:600 1rem inherit;cursor:pointer}
+button.sec{background:transparent;color:var(--cor);border:1px solid var(--linha);margin-top:.6rem}
+button:disabled{opacity:.5}
+:focus-visible{outline:2px solid var(--cor);outline-offset:2px}
+.erro{color:var(--erro);min-height:1.3rem;margin:.6rem 0 0}
+.l2{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.dica{font-size:.8rem;color:var(--suave);margin-top:.8rem}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<h1>RRFS Social</h1>
+<p class="sub">Mensageiro sem servidores. Funciona pela internet, na rede local ou onde houver uma rota.</p>
+
+<div class="caixa" id="f-entrar">
+  <label for="e-login">Usuário</label>
+  <select id="e-login" hidden></select>
+  <input id="e-login-t" autocomplete="username" autocapitalize="none" placeholder="seu usuário">
+  <label for="e-senha">Senha</label>
+  <input id="e-senha" type="password" autocomplete="current-password">
+  <p class="erro" id="e-erro" role="alert"></p>
+  <button id="b-entrar">Entrar</button>
+  <button class="sec" id="b-novo">Criar nova conta</button>
+  <button class="sec" id="b-vinc">Vincular a uma conta de outro aparelho</button>
+  <button class="sec" id="b-rest">Restaurar backup da conta</button>
+</div>
+
+<div class="caixa" id="f-criar" hidden>
+  <div class="l2">
+    <div><label for="c-nome">Nome</label><input id="c-nome" maxlength="40" autocomplete="given-name"></div>
+    <div><label for="c-sob">Sobrenome</label><input id="c-sob" maxlength="60" autocomplete="family-name"></div>
+  </div>
+  <label for="c-login">Usuário (só neste computador)</label>
+  <input id="c-login" autocapitalize="none" maxlength="32" placeholder="ex.: maria.silva">
+  <label for="c-senha">Senha (8 caracteres ou mais)</label>
+  <input id="c-senha" type="password" autocomplete="new-password">
+  <label for="c-senha2">Repita a senha</label>
+  <input id="c-senha2" type="password" autocomplete="new-password">
+  <p class="erro" id="c-erro" role="alert"></p>
+  <button id="b-criar">Criar conta</button>
+  <button class="sec" id="b-voltar">Voltar</button>
+  <button class="sec" id="b-vinc2">Já tenho conta em outro aparelho: vincular</button>
+  <button class="sec" id="b-rest2">Restaurar backup da conta</button>
+  <p class="dica">A senha protege tudo que fica neste computador. Não existe recuperação: se esquecer, os dados não abrem. Anote a senha num lugar seguro.</p>
+</div>
+<div class="caixa" id="f-vinc" hidden>
+  <p class="dica" style="margin-top:0">No aparelho principal, abra <b>Conta › Vincular novo dispositivo</b> e cole aqui o código. Este aparelho passa a mostrar a mesma conta, em tempo real, por um túnel criptografado. O principal precisa estar ligado.</p>
+  <label for="v-cod">Código de vínculo</label><input id="v-cod" autocomplete="off" placeholder="RRFSDEV:…">
+  <label for="v-nome">Nome deste aparelho</label><input id="v-nome" maxlength="40" placeholder="ex.: Notebook da sala">
+  <div class="l2"><div><label for="v-login">Usuário neste aparelho</label><input id="v-login" autocapitalize="none" maxlength="32"></div>
+  <div><label for="v-senha">Senha deste aparelho</label><input id="v-senha" type="password" autocomplete="new-password"></div></div>
+  <p class="erro" id="v-erro" role="alert"></p>
+  <button id="b-vinc-ok">Vincular</button><button class="sec" data-volta>Voltar</button>
+  <p class="dica">A conexão pode levar até um minuto.</p>
+</div>
+
+<div class="caixa" id="f-rest" hidden>
+  <p class="dica" style="margin-top:0">Restaure um backup gerado em <b>Conta › Baixar backup</b>. Você entra depois com a <b>mesma senha</b> da conta original. Atenção: não deixe a conta aberta nos dois aparelhos ao mesmo tempo, porque a mesma identidade não pode estar conectada em dois lugares (use “Vincular” para isso).</p>
+  <label for="r-arq">Arquivo de backup (.zip)</label><input id="r-arq" type="file" accept=".zip,application/zip">
+  <label for="r-login">Nome de usuário neste aparelho (opcional)</label><input id="r-login" autocapitalize="none" maxlength="32">
+  <p class="erro" id="r-erro" role="alert"></p>
+  <button id="b-rest-ok">Restaurar</button><button class="sec" data-volta>Voltar</button>
+</div>
+</main>
+<script>
+const $=i=>document.getElementById(i);
+async function api(p,b){const r=await fetch(p,{method:b?'POST':'GET',headers:{'X-RRFS':'1','Content-Type':'application/json'},body:b?JSON.stringify(b):undefined});
+ let j={};try{j=await r.json()}catch(e){}if(!r.ok)throw new Error(j.erro||('Erro '+r.status));return j}
+function login(){return $('e-login').hidden?$('e-login-t').value:$('e-login').value}
+async function entrar(){$('e-erro').textContent='';$('b-entrar').disabled=true;
+ try{await api('/api/login',{login:login(),senha:$('e-senha').value});location='/'}
+ catch(e){$('e-erro').textContent=e.message}$('b-entrar').disabled=false}
+async function criar(){$('c-erro').textContent='';
+ if($('c-senha').value!==$('c-senha2').value)return $('c-erro').textContent='As senhas não são iguais.';
+ $('b-criar').disabled=true;
+ try{await api('/api/criar_conta',{login:$('c-login').value,senha:$('c-senha').value,nome:$('c-nome').value,sobrenome:$('c-sob').value});location='/'}
+ catch(e){$('c-erro').textContent=e.message}$('b-criar').disabled=false}
+$('b-entrar').onclick=entrar;$('b-criar').onclick=criar;
+$('e-senha').onkeydown=e=>{if(e.key==='Enter')entrar()};
+$('b-novo').onclick=()=>{$('f-entrar').hidden=true;$('f-criar').hidden=false;$('c-nome').focus()};
+$('b-voltar').onclick=()=>{$('f-criar').hidden=true;$('f-entrar').hidden=false};
+const caixas=['f-entrar','f-criar','f-vinc','f-rest'];
+function mostra(id){caixas.forEach(c=>$(c).hidden=c!==id);}
+$('b-vinc').onclick=()=>{mostra('f-vinc');$('v-cod').focus()};
+$('b-rest').onclick=()=>mostra('f-rest');
+$('b-vinc2').onclick=()=>$('b-vinc').onclick();$('b-rest2').onclick=()=>$('b-rest').onclick();
+document.querySelectorAll('[data-volta]').forEach(b=>b.onclick=()=>mostra('f-entrar'));
+$('b-vinc-ok').onclick=async()=>{$('v-erro').textContent='';$('b-vinc-ok').disabled=true;$('b-vinc-ok').textContent='Conectando ao principal…';
+ try{await api('/api/vincular',{codigo:$('v-cod').value,nome:$('v-nome').value,login:$('v-login').value,senha:$('v-senha').value});location='/'}
+ catch(e){$('v-erro').textContent=e.message}$('b-vinc-ok').disabled=false;$('b-vinc-ok').textContent='Vincular'};
+$('b-rest-ok').onclick=async()=>{$('r-erro').textContent='';const f=$('r-arq').files[0];if(!f)return $('r-erro').textContent='Escolha o arquivo.';
+ const fd=new FormData();fd.append('arquivo',f);fd.append('login',$('r-login').value);$('b-rest-ok').disabled=true;
+ try{const r=await fetch('/api/restaurar',{method:'POST',headers:{'X-RRFS':'1'},body:fd});const j=await r.json();if(!r.ok)throw new Error(j.erro||'Falha');
+  mostra('f-entrar');location.reload()}catch(e){$('r-erro').textContent=e.message}$('b-rest-ok').disabled=false};
+api('/api/contas').then(r=>{
+ if(r.contas.length){const s=$('e-login');s.hidden=false;$('e-login-t').hidden=true;
+  s.replaceChildren(...r.contas.map(c=>{const o=document.createElement('option');o.value=o.textContent=c;return o}));
+  if(r.aberta)s.value=r.aberta;$('e-senha').focus()}
+ else{$('b-novo').click()}
+}).catch(()=>{});
+</script>
+</body>
+</html>

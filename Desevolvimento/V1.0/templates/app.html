@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RRFS Social</title>
+<style>
+:root{--fundo:#0e1418;--painel:#161e24;--painel2:#1c262d;--campo:#0f161b;--tinta:#e4eaee;--suave:#8a9aa6;--linha:#26323b;--cor:#3aa6d8;--cor-t:#06151d;--meu:#17445a;--ok:#5cc489;--aviso:#e0a24a;--erro:#f2877f}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--fundo);color:var(--tinta);font:15px/1.45 system-ui,"Segoe UI",sans-serif;overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+input,select,textarea{width:100%;padding:.55rem .7rem;background:var(--campo);border:1px solid var(--linha);border-radius:6px}
+textarea{resize:vertical;min-height:4rem}
+button{cursor:pointer;padding:.45rem .85rem;border-radius:6px;border:1px solid var(--linha);background:var(--painel2)}
+button.pri{background:var(--cor);color:var(--cor-t);border-color:var(--cor);font-weight:600}
+button.perigo{color:var(--erro)}
+button.peq{padding:.2rem .55rem;font-size:.85rem}
+button:disabled{opacity:.5}
+:focus-visible{outline:2px solid var(--cor);outline-offset:2px}
+h2,h3{margin:0;font-weight:600}
+label{display:block;font-size:.82rem;color:var(--suave);margin:.7rem 0 .25rem}
+.suave{color:var(--suave)}.ok{color:var(--ok)}.erro{color:var(--erro)}.aviso{color:var(--aviso)}
+.linha{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}.cresce{flex:1;min-width:0}
+.mono{font-family:ui-monospace,Consolas,monospace;font-size:.78rem;word-break:break-all}
+.caixa{background:var(--painel);border:1px solid var(--linha);border-radius:8px;padding:.8rem 1rem;margin:0 0 .7rem}
+[hidden]{display:none!important}
+#app{display:grid;grid-template-columns:22rem 1fr;height:100%}
+#lado{display:flex;flex-direction:column;border-right:1px solid var(--linha);background:var(--painel);min-height:0}
+#topo{padding:.7rem .9rem;border-bottom:1px solid var(--linha)}
+#topo .nome{font-weight:600}
+#abas{display:flex;border-bottom:1px solid var(--linha)}
+#abas button{flex:1;border:0;border-radius:0;background:transparent;padding:.6rem .2rem;font-size:.85rem;color:var(--suave);border-bottom:2px solid transparent;position:relative}
+#abas button.at{color:var(--tinta);border-bottom-color:var(--cor)}
+.bolha{background:var(--cor);color:var(--cor-t);border-radius:99px;font-size:.7rem;padding:0 .4rem;margin-left:.25rem;font-weight:700}
+#lista{flex:1;overflow:auto;padding:.6rem}
+#centro{display:flex;flex-direction:column;min-width:0;min-height:0}
+.item{display:flex;gap:.65rem;align-items:center;padding:.55rem .6rem;border-radius:8px;cursor:pointer}
+.item:hover,.item.at{background:var(--painel2)}
+.item .t{min-width:0;flex:1}.item .t b,.item .t span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .t span{font-size:.82rem;color:var(--suave)}
+.av{width:2.5rem;height:2.5rem;border-radius:50%;flex:none;background:#2a4352;display:grid;place-items:center;font-weight:700;overflow:hidden;position:relative}
+.av img{width:100%;height:100%;object-fit:cover}
+.av.g{background:#3b3a5c}
+.pt{position:absolute;right:0;bottom:0;width:.7rem;height:.7rem;border-radius:50%;background:var(--ok);border:2px solid var(--painel)}
+#vazio{margin:auto;color:var(--suave);text-align:center;padding:2rem}
+#cab{display:flex;gap:.7rem;align-items:center;padding:.6rem .9rem;border-bottom:1px solid var(--linha);background:var(--painel)}
+#voltar{display:none}
+#msgs{flex:1;overflow:auto;padding:.9rem;display:flex;flex-direction:column;gap:.35rem}
+.m{max-width:min(34rem,82%);padding:.4rem .65rem;border-radius:10px;background:var(--painel2);align-self:flex-start;word-wrap:break-word;overflow-wrap:anywhere}
+.m.meu{background:var(--meu);align-self:flex-end}
+.m .quem{font-size:.78rem;color:var(--cor);font-weight:600}
+.m .txt{white-space:pre-wrap}
+.m .hora{font-size:.7rem;color:var(--suave);text-align:right;margin-top:.1rem}
+.m img.mi,.m video{max-width:100%;max-height:22rem;border-radius:6px;display:block;margin:.2rem 0}
+.m audio{max-width:100%}
+.sis{align-self:center;font-size:.8rem;color:var(--suave);background:var(--painel);padding:.1rem .7rem;border-radius:99px}
+#comp{display:flex;gap:.5rem;padding:.6rem .9rem;border-top:1px solid var(--linha);background:var(--painel);align-items:flex-end}
+#comp textarea{min-height:2.4rem;max-height:8rem;resize:none}
+.capa{height:7rem;border-radius:8px;background:linear-gradient(120deg,#17445a,#3b3a5c) center/cover;margin-bottom:-2rem}
+.perf{display:flex;gap:.8rem;align-items:flex-end;padding:0 .8rem}
+.perf .av{width:4.5rem;height:4.5rem;border:3px solid var(--painel);font-size:1.5rem}
+#fundo-m{position:fixed;inset:0;background:#000a;display:grid;place-items:center;z-index:20;padding:1rem}
+#mod{background:var(--painel);border:1px solid var(--linha);border-radius:10px;width:min(34rem,100%);max-height:92vh;overflow:auto;padding:1rem}
+#mod.largo{width:min(46rem,100%)}
+.toast{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:var(--tinta);color:var(--fundo);padding:.55rem 1rem;border-radius:8px;z-index:30;max-width:90vw}
+.sec{margin:.9rem 0 .4rem;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--suave)}
+.anel{box-shadow:0 0 0 2px var(--cor)}
+.st{width:100%;max-height:60vh;object-fit:contain;border-radius:8px;display:block;margin:.5rem 0}
+.sttxt{font-size:1.3rem;padding:2rem 1rem;text-align:center;background:var(--painel2);border-radius:8px;white-space:pre-wrap}
+@media(max-width:760px){
+ #app{grid-template-columns:1fr}
+ #centro{display:none}
+ body.chat #lado{display:none}body.chat #centro{display:flex}
+ #voltar{display:inline-block}
+}
+</style>
+</head>
+<body>
+<div id="app">
+ <aside id="lado">
+  <div id="topo">
+   <div class="linha"><span class="nome cresce" id="t-nome"></span><span id="t-rede" class="suave" style="font-size:.8rem"></span></div>
+   <div id="t-info" class="suave" style="font-size:.78rem"></div>
+  </div>
+  <nav id="abas"></nav>
+  <div id="lista"></div>
+ </aside>
+ <section id="centro">
+  <div id="vazio">Escolha uma conversa ou adicione contatos na aba Contatos.</div>
+ </section>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function h(t,a,...k){const e=document.createElement(t);for(const[n,v]of Object.entries(a||{})){
+ if(n==='class')e.className=v;else if(n.startsWith('on'))e.addEventListener(n.slice(2),v);
+ else if(n==='value')e.value=v;else if(v!==false&&v!=null)e.setAttribute(n,v===true?'':v)}
+ for(const c of k.flat()){if(c==null||c===false)continue;e.append(c.nodeType?c:document.createTextNode(String(c)))}return e}
+async function api(p,m='GET',b){const o={method:m,headers:{'X-RRFS':'1'}};
+ if(b instanceof FormData)o.body=b;else if(b!==undefined){o.headers['Content-Type']='application/json';o.body=JSON.stringify(b)}
+ const r=await fetch(p,o);let j={};try{j=await r.json()}catch(e){}
+ if(r.status===401&&!p.includes('login')){location='/';throw new Error('login')}
+ if(!r.ok)throw new Error(j.erro||('Erro '+r.status));return j}
+function aviso(t,ruim){const e=h('div',{class:'toast',role:'status'},t);document.body.append(e);setTimeout(()=>e.remove(),ruim?6000:2800)}
+async function tenta(fn,ok){try{const r=await fn();if(ok)aviso(ok);return r}catch(e){if(e.message!=='login')aviso(e.message,true)}}
+function copiar(t){navigator.clipboard.writeText(t).then(()=>aviso('Copiado.'),()=>aviso('Não foi possível copiar.',true))}
+function hora(ts){const d=new Date(ts*1000),hj=new Date();return d.toDateString()===hj.toDateString()?d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):d.toLocaleDateString([],{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+function av(mini,nome,grupo,online){const a=h('div',{class:'av'+(grupo?' g':'')});
+ if(mini)a.append(h('img',{src:mini,alt:''}));else a.append((nome||'?').trim().slice(0,1).toUpperCase());
+ if(online)a.append(h('i',{class:'pt'}));return a}
+function img2url(file,max,q,quad){return new Promise((res,rej)=>{const i=new Image(),u=URL.createObjectURL(file);
+ i.onload=()=>{let w=i.width,hh=i.height,sx=0,sy=0,sw=w,sh=hh;
+  if(quad){const m=Math.min(w,hh);sx=(w-m)/2;sy=(hh-m)/2;sw=sh=m;w=hh=max}else{const k=Math.min(1,max/Math.max(w,hh));w=Math.round(w*k);hh=Math.round(hh*k)}
+  const c=document.createElement('canvas');c.width=w;c.height=hh;c.getContext('2d').drawImage(i,sx,sy,sw,sh,0,0,w,hh);
+  URL.revokeObjectURL(u);res(c.toDataURL('image/jpeg',q))};
+ i.onerror=()=>rej(new Error('Imagem inválida.'));i.src=u})}
+function modal(titulo,largo,...c){fechar();const m=h('div',{id:'mod',class:largo?'largo':''},
+ h('div',{class:'linha',style:'margin-bottom:.6rem'},h('h2',{class:'cresce'},titulo),h('button',{class:'peq',onclick:fechar},'Fechar')),...c);
+ const f=h('div',{id:'fundo-m',onclick:e=>{if(e.target===f)fechar()}},m);document.body.append(f);return m}
+function fechar(){const f=$('#fundo-m');if(f)f.remove()}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')fechar()});
+
+let est={},aba='conversas',cid=null,convs=[],evN=0,eu={};
+const ABAS=[['conversas','Conversas'],['contatos','Contatos'],['grupos','Grupos'],['status','Status'],['conta','Conta']];
+
+/* ── topo / abas ── */
+async function topo(){try{est=await api('/api/estado')}catch(e){return}
+ eu=est.perfil;$('#t-nome').textContent=(eu.nome+' '+eu.sobrenome).trim();
+ $('#t-rede').textContent=['● sem rede','● TCP','● UDP'][est.rede];$('#t-rede').className=est.rede?'ok':'erro';
+ $('#t-info').textContent=est.conectados+' conectados · '+est.diretorio+' no diretório'+(est.fila?' · '+est.fila+' na fila de envio':'');
+ const n={conversas:est.nao_lidas,contatos:est.pedidos,grupos:est.convites};
+ $('#abas').replaceChildren(...ABAS.map(([k,t])=>h('button',{class:k===aba?'at':'',onclick:()=>{aba=k;lista()}},t,n[k]?h('span',{class:'bolha'},n[k]):null)));
+ document.title=(est.nao_lidas?'('+est.nao_lidas+') ':'')+'RRFS Social'}
+async function lista(){await topo();const L=$('#lista');L.replaceChildren();
+ try{await ({conversas:vConversas,contatos:vContatos,grupos:vGrupos,status:vStatus,conta:vConta})[aba](L)}catch(e){if(e.message!=='login')aviso(e.message,true)}}
+
+/* ── conversas ── */
+async function vConversas(L){convs=(await api('/api/conversas')).conversas;
+ if(!convs.length)L.append(h('p',{class:'suave',style:'padding:.5rem'},'Nenhuma conversa ainda. Adicione um contato ou crie um grupo.'));
+ for(const c of convs)L.append(h('div',{class:'item'+(c.cid===cid?' at':''),onclick:()=>abrir(c.cid,c)},
+  av(c.foto_mini,c.nome,c.grupo,c.online),
+  h('div',{class:'t'},h('b',{},c.nome),h('span',{},c.previa||'')),
+  h('div',{style:'text-align:right'},h('div',{class:'suave',style:'font-size:.72rem'},hora(c.ts)),c.nao_lidas?h('span',{class:'bolha'},c.nao_lidas):null)))}
+async function abrir(id,info){cid=id;document.body.classList.add('chat');
+ if(!info)info=convs.find(c=>c.cid===id)||{nome:id.startsWith('g:')?'Grupo':'Conversa'};
+ const grupo=id.startsWith('g:'),somenteLeitura=grupo&&info.estado&&info.estado!=='ativo';
+ const C=$('#centro');
+ const msgs=h('div',{id:'msgs'});
+ const txt=h('textarea',{rows:1,placeholder:'Escreva uma mensagem',maxlength:8000});
+ const arq=h('input',{type:'file',hidden:true});
+ const enviar=async()=>{const t=txt.value.trim();if(!t)return;txt.value='';
+  if(await tenta(()=>api('/api/enviar','POST',{cid,texto:t}))===undefined)txt.value=t;carregar()};
+ txt.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();enviar()}};
+ arq.onchange=async()=>{const f=arq.files[0];if(!f)return;const fd=new FormData();fd.append('cid',cid);fd.append('arquivo',f);fd.append('legenda',txt.value.trim());txt.value='';
+  aviso('Enviando '+f.name+'…');await tenta(()=>api('/api/enviar_arquivo','POST',fd),'Arquivo enviado.');arq.value='';carregar()};
+ C.replaceChildren(
+  h('div',{id:'cab'},h('button',{id:'voltar',onclick:()=>{document.body.classList.remove('chat')}},'‹'),
+   av(info.foto_mini,info.nome,grupo,info.online),h('div',{class:'cresce'},h('b',{},info.nome),h('div',{class:'suave',style:'font-size:.78rem'},grupo?'Grupo':(info.online?'online':'offline'))),
+   h('button',{class:'peq',onclick:()=>grupo?infoGrupo(id.slice(2)):perfilContato(id.slice(2))},grupo?'Info do grupo':'Perfil')),
+  msgs,
+  somenteLeitura?h('div',{class:'suave',style:'padding:.8rem;text-align:center'},'Você não participa mais deste grupo.'):
+  h('div',{id:'comp'},h('button',{onclick:()=>arq.click(),title:'Anexar'},'＋'),arq,txt,h('button',{class:'pri',onclick:enviar},'Enviar')));
+ await carregar(true);api('/api/lido','POST',{cid}).then(topo);if(aba==='conversas')lista();txt.focus()}
+function bolhaArq(m){const a=m.arq,u='/api/midia/'+a.local;
+ if(a.estado==='ok'){
+  if(m.tipo==='imagem')return h('a',{href:u,target:'_blank'},h('img',{class:'mi',src:u,alt:a.nome,loading:'lazy'}));
+  if(m.tipo==='video')return h('video',{src:u,controls:true,preload:'metadata'});
+  if(m.tipo==='audio')return h('audio',{src:u,controls:true});
+  return h('a',{href:u,download:a.nome},'Baixar '+a.nome+' ('+tam(a.tam)+')')}
+ if(a.estado==='pendente')return h('div',{class:'suave'},a.nome+' · baixando'+(a.progresso!=null?' '+a.progresso+'%':'…'));
+ return h('div',{},a.nome+' ('+tam(a.tam)+') ',h('button',{class:'peq',onclick:()=>tenta(async()=>{await api('/api/baixar','POST',{cid,mid:m.id});carregar()})},a.estado==='falhou'?'Tentar de novo':'Baixar'))}
+function tam(n){return n>1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB'}
+const TQ={pendente:'○',enviada:'✓',entregue:'✓✓',recebida:''};
+async function carregar(fundo){if(!cid)return;const id=cid;let r;try{r=await api('/api/conversa/'+encodeURIComponent(id))}catch(e){return}
+ if(id!==cid)return;const box=$('#msgs');if(!box)return;const perto=fundo||box.scrollHeight-box.scrollTop-box.clientHeight<120;
+ box.replaceChildren(...r.mensagens.map(m=>{
+  if(m.tipo==='sistema')return h('div',{class:'sis'},m.texto);
+  return h('div',{class:'m'+(m.meu?' meu':'')},id.startsWith('g:')&&!m.meu?h('div',{class:'quem'},m.nome):null,
+   m.arq?bolhaArq(m):null,m.texto?h('div',{class:'txt'},m.texto):null,
+   h('div',{class:'hora'},hora(m.ts)+(m.meu?' '+TQ[m.estado]:'')))}));
+ if(perto)box.scrollTop=box.scrollHeight}
+
+/* ── contatos ── */
+async function vContatos(L){const d=await api('/api/contatos');
+ const q=h('input',{placeholder:'Buscar pessoas pelo nome',autocomplete:'off'}),res=h('div');
+ let tm;q.oninput=()=>{clearTimeout(tm);tm=setTimeout(async()=>{const t=q.value.trim();if(t.length<2){res.replaceChildren();return}
+  res.replaceChildren(h('p',{class:'suave'},'Buscando na rede…'));
+  try{const r=await api('/api/buscar?q='+encodeURIComponent(t));
+   res.replaceChildren(r.resultados.length?h('div',{class:'sec'},'Resultados (consultei '+r.consultados+' pares)'):h('p',{class:'suave'},'Ninguém parecido. A rede ainda pode estar sincronizando ('+r.consultados+' pares consultados).'),
+   ...r.resultados.map(p=>h('div',{class:'item'},av(p.foto_mini,p.nome),
+    h('div',{class:'t'},h('b',{},p.nome+' '+p.sobrenome),h('span',{},'chave '+p.impressao+'…'+(p.verificado?'':' (não confirmado)'))),
+    p.relacao==='ativo'?h('span',{class:'ok'},'contato'):p.relacao==='pend_env'?h('span',{class:'suave'},'enviado'):
+    h('button',{class:'peq pri',onclick:ev=>tenta(async()=>{await api('/api/contatos/adicionar','POST',{addr:p.addr});ev.target.replaceWith('enviado');},'Pedido enviado.')},'Adicionar'))))}
+  catch(e){res.replaceChildren(h('p',{class:'erro'},e.message))}},350)};
+ const chave=h('input',{placeholder:'Ou cole a chave (76 caracteres)'});
+ L.append(q,res,h('div',{class:'linha',style:'margin:.5rem 0'},h('div',{class:'cresce'},chave),
+  h('button',{class:'pri',onclick:()=>tenta(async()=>{await api('/api/contatos/adicionar','POST',{addr:chave.value});chave.value='';lista()},'Pedido enviado.')},'Adicionar')));
+ if(d.pedidos.length){L.append(h('div',{class:'sec'},'Pedidos recebidos'));
+  for(const p of d.pedidos)L.append(h('div',{class:'caixa'},h('b',{},p.nome||'Sem nome'),h('div',{class:'mono suave'},'chave '+p.pub.slice(0,8)+'…'),
+   h('div',{class:'linha',style:'margin-top:.4rem'},h('button',{class:'pri peq',onclick:()=>tenta(async()=>{await api('/api/contatos/aceitar','POST',{pub:p.pub});lista()},'Contato adicionado.')},'Aceitar'),
+   h('button',{class:'peq',onclick:()=>tenta(async()=>{await api('/api/contatos/recusar','POST',{pub:p.pub});lista()})},'Recusar'),
+   h('button',{class:'peq perigo',onclick:()=>tenta(async()=>{await api('/api/contatos/recusar','POST',{pub:p.pub,bloquear:true});lista()})},'Bloquear'))))}
+ L.append(h('div',{class:'sec'},'Meus contatos ('+d.contatos.length+')'));
+ if(!d.contatos.length)L.append(h('p',{class:'suave'},'Nenhum contato ainda.'));
+ for(const c of d.contatos)L.append(h('div',{class:'item',onclick:()=>c.estado==='ativo'?abrir('p:'+c.pub,{nome:(c.nome+' '+c.sobrenome).trim(),foto_mini:c.foto_mini,online:c.online}):perfilContato(c.pub)},
+  av(c.foto_mini,c.nome,false,c.online),h('div',{class:'t'},h('b',{},(c.nome+' '+c.sobrenome).trim()||'Usuário '+c.impressao),h('span',{},c.estado==='ativo'?(c.online?'online':'offline'):'aguardando aceite'))))}
+async function perfilContato(pub){let c;try{c=await api('/api/contato/'+pub)}catch(e){return aviso(e.message,true)}
+ const nome=(c.nome+' '+c.sobrenome).trim()||'Usuário '+c.impressao;
+ const capa=h('div',{class:'capa'});if(c.capa)capa.style.backgroundImage='url(/api/midia/'+c.capa+')';
+ const a=av(c.foto?'/api/midia/'+c.foto:c.foto_mini,nome,false,c.online);
+ modal('Perfil',false,capa,h('div',{class:'perf'},a,h('div',{style:'padding-bottom:.2rem'},h('h3',{},nome),h('div',{class:'suave',style:'font-size:.8rem'},c.estado==='ativo'?(c.online?'online':'offline'):'aguardando aceite'))),
+  h('p',{style:'margin-top:1rem;white-space:pre-wrap'},c.bio||h('span',{class:'suave'},'Sem biografia.')),
+  h('label',{},'Impressão da chave (confira com a pessoa por outro meio)'),h('div',{class:'mono'},c.pub.slice(0,16)+'…'),
+  h('div',{class:'linha',style:'margin-top:1rem'},c.estado==='ativo'?h('button',{class:'pri',onclick:()=>{fechar();abrir('p:'+pub,{nome,foto_mini:c.foto_mini,online:c.online})}},'Conversar'):null,
+   h('button',{class:'perigo',onclick:()=>{if(confirm('Remover '+nome+' dos contatos?'))tenta(async()=>{await api('/api/contatos/remover','POST',{pub});fechar();lista()},'Contato removido.')}},'Remover'),
+   h('button',{class:'perigo',onclick:()=>{if(confirm('Bloquear '+nome+'?'))tenta(async()=>{await api('/api/contatos/bloquear','POST',{pub});fechar();lista()},'Bloqueado.')}},'Bloquear')))}
+
+/* ── grupos ── */
+async function vGrupos(L){const d=await api('/api/grupos');
+ L.append(h('button',{class:'pri',style:'width:100%',onclick:novoGrupo},'Criar grupo'));
+ if(d.convites.length){L.append(h('div',{class:'sec'},'Convites'));
+  for(const c of d.convites)L.append(h('div',{class:'caixa'},h('b',{},c.nome),h('div',{class:'suave',style:'font-size:.82rem'},'de '+c.de+' · '+c.membros+' membros'),c.desc?h('div',{},c.desc):null,
+   h('div',{class:'linha',style:'margin-top:.4rem'},h('button',{class:'pri peq',onclick:()=>tenta(async()=>{await api('/api/convites/aceitar','POST',{gid:c.gid});lista()},'Você entrou no grupo.')},'Entrar'),
+   h('button',{class:'peq',onclick:()=>tenta(async()=>{await api('/api/convites/recusar','POST',{gid:c.gid});lista()})},'Recusar'))))}
+ L.append(h('div',{class:'sec'},'Meus grupos'));
+ if(!d.grupos.length)L.append(h('p',{class:'suave'},'Você não está em nenhum grupo.'));
+ for(const g of d.grupos)L.append(h('div',{class:'item',onclick:()=>abrir('g:'+g.gid,{nome:g.nome,grupo:true,estado:g.estado})},av('',g.nome,true),
+  h('div',{class:'t'},h('b',{},g.nome),h('span',{},g.estado==='ativo'?g.membros+' membros'+(g.admin?' · admin':''):'você não participa'))))}
+async function novoGrupo(){const cs=(await api('/api/contatos')).contatos.filter(c=>c.estado==='ativo'&&c.addr);
+ const nome=h('input',{maxlength:60}),desc=h('input',{maxlength:300}),sel=new Set(),chaves=h('textarea',{placeholder:'Uma chave por linha (opcional)'});
+ modal('Novo grupo',false,h('label',{},'Nome'),nome,h('label',{},'Descrição'),desc,
+  h('label',{},'Convidar contatos (cada um precisa aceitar)'),
+  ...cs.map(c=>h('label',{class:'linha',style:'color:inherit;margin:.2rem 0'},h('input',{type:'checkbox',style:'width:auto',onchange:e=>e.target.checked?sel.add(c.addr):sel.delete(c.addr)}),(c.nome+' '+c.sobrenome).trim())),
+  h('label',{},'Convidar por chave'),chaves,
+  h('p',{},h('button',{class:'pri',onclick:()=>tenta(async()=>{const m=[...sel,...chaves.value.split(/\s+/).filter(Boolean)];
+   const r=await api('/api/grupos/criar','POST',{nome:nome.value,desc:desc.value,membros:m});fechar();aba='grupos';await lista();
+   if(r.avisos.length)aviso(r.avisos.join(' '),true);abrir('g:'+r.gid,{nome:nome.value,grupo:true,estado:'ativo'})},'Grupo criado.')},'Criar')))}
+async function infoGrupo(gid){let g;try{g=await api('/api/grupo/'+gid)}catch(e){return aviso(e.message,true)}
+ const ac=(a,b,ok)=>tenta(async()=>{await api('/api/grupo/'+gid+'/'+a,'POST',b);infoGrupo(gid);lista()},ok);
+ const nome=h('input',{value:g.nome,maxlength:60}),desc=h('input',{value:g.desc,maxlength:300});
+ const m=modal('Grupo',false,
+  g.sou_admin&&g.estado==='ativo'?[h('label',{},'Nome'),nome,h('label',{},'Descrição'),desc,h('p',{},h('button',{class:'peq',onclick:()=>ac('editar',{nome:nome.value,desc:desc.value},'Salvo.')},'Salvar'))]:[h('h3',{},g.nome),h('p',{class:'suave'},g.desc)],
+  h('div',{class:'sec'},'Membros ('+g.membros.length+')'),
+  ...g.membros.map(x=>h('div',{class:'item',style:'cursor:default'},av(x.foto_mini,x.nome,false,x.online&&!x.eu),
+   h('div',{class:'t'},h('b',{},x.nome+(x.eu?' (você)':'')),h('span',{},x.dono?'dono':x.admin?'administrador':'membro')),
+   g.sou_admin&&!x.eu&&g.estado==='ativo'?h('div',{class:'linha'},
+    g.sou_dono?h('button',{class:'peq',onclick:()=>ac('admin',{pub:x.pub,admin:!x.admin})},x.admin?'Tirar admin':'Tornar admin'):(!x.admin?h('button',{class:'peq',onclick:()=>ac('admin',{pub:x.pub,admin:true})},'Tornar admin'):null),
+    (!x.dono&&(g.sou_dono||!x.admin))?h('button',{class:'peq perigo',onclick:()=>{if(confirm('Remover '+x.nome+'?'))ac('remover',{pub:x.pub},'Removido.')}},'Remover'):null):null)));
+ if(g.sou_admin&&g.estado==='ativo'){const cs=(await api('/api/contatos')).contatos.filter(c=>c.estado==='ativo'&&c.addr&&!g.membros.some(x=>x.pub===c.pub));
+  const s=h('select',{},h('option',{value:''},'Escolher contato…'),...cs.map(c=>h('option',{value:c.addr},(c.nome+' '+c.sobrenome).trim())));
+  const k=h('input',{placeholder:'Ou cole a chave de quem não é contato'});
+  m.append(h('div',{class:'sec'},'Convidar'),s,h('div',{style:'height:.4rem'}),k,h('p',{},h('button',{class:'pri peq',onclick:()=>{const a=k.value.trim()||s.value;if(a)ac('convidar',{addr:a},'Convite enviado.')}},'Convidar')))}
+ if(g.estado==='ativo')m.append(h('p',{},h('button',{class:'perigo',onclick:()=>{if(confirm('Sair do grupo?'))tenta(async()=>{await api('/api/grupo/'+gid+'/sair','POST',{});fechar();lista();abrir('g:'+gid,{nome:g.nome,grupo:true,estado:'saiu'})},'Você saiu.')}},'Sair do grupo')))}
+
+/* ── status (24 h) ── */
+async function vStatus(L){const d=(await api('/api/status')).status;
+ const txt=h('textarea',{maxlength:700,placeholder:'Escreva um status (some em 24 horas)'}),f=h('input',{type:'file',accept:'image/*,video/*'});
+ L.append(h('div',{class:'caixa'},txt,h('div',{class:'linha',style:'margin-top:.4rem'},h('div',{class:'cresce'},f),
+  h('button',{class:'pri',onclick:()=>tenta(async()=>{const fd=new FormData();fd.append('texto',txt.value);if(f.files[0])fd.append('arquivo',f.files[0]);await api('/api/status','POST',fd);lista()},'Status publicado.')},'Publicar'))));
+ if(!d.length)L.append(h('p',{class:'suave'},'Nenhum status no momento.'));
+ for(const g of d)L.append(h('div',{class:'item',onclick:()=>verStatus(g,0)},(()=>{const a=av(g.foto_mini,g.nome);if(g.novos)a.classList.add('anel');return a})(),
+  h('div',{class:'t'},h('b',{},g.nome),h('span',{},g.itens.length+' status · '+hora(g.itens[g.itens.length-1].ts)+(g.novos?' · '+g.novos+' novo(s)':'')))))}
+function verStatus(g,i){const s=g.itens[i];api('/api/status/'+s.id+'/visto','POST',{}).then(topo);
+ const corpo=s.midia?(s.tipo==='video'?h('video',{class:'st',src:'/api/midia/'+s.midia,controls:true,autoplay:true}):h('img',{class:'st',src:'/api/midia/'+s.midia,alt:''})):(s.tipo!=='texto'?h('p',{class:'suave'},'Baixando mídia…'):null);
+ modal(g.nome,false,corpo,s.texto?h('div',{class:s.midia?'':'sttxt'},s.texto):null,
+  h('div',{class:'suave',style:'font-size:.8rem;margin-top:.4rem'},hora(s.ts)+' · expira '+hora(s.exp)),
+  h('div',{class:'linha',style:'margin-top:.7rem'},h('button',{disabled:i===0,onclick:()=>verStatus(g,i-1)},'‹ Anterior'),h('button',{disabled:i===g.itens.length-1,onclick:()=>verStatus(g,i+1)},'Próximo ›'),
+   g.meu?h('button',{class:'perigo',onclick:()=>tenta(async()=>{await api('/api/status/'+s.id,'DELETE');fechar();lista()},'Status apagado.')},'Apagar'):null))}
+
+/* ── conta / perfil / rede ── */
+async function vConta(L){const p=(await api('/api/perfil')).perfil;
+ const capa=h('div',{class:'capa'});if(p.capa_mid)capa.style.backgroundImage='url(/api/midia/'+p.capa_mid+')';
+ const fa=h('input',{type:'file',accept:'image/*',hidden:true}),fc=h('input',{type:'file',accept:'image/*',hidden:true});
+ const nome=h('input',{value:p.nome,maxlength:40}),sob=h('input',{value:p.sobrenome,maxlength:60}),bio=h('textarea',{maxlength:500},p.bio),
+  vis=h('input',{type:'checkbox',style:'width:auto'});vis.checked=p.visivel;
+ fa.onchange=()=>fa.files[0]&&tenta(async()=>{await api('/api/perfil','POST',{foto:await img2url(fa.files[0],512,.85),foto_mini:await img2url(fa.files[0],64,.6,true)});lista()},'Foto atualizada.');
+ fc.onchange=()=>fc.files[0]&&tenta(async()=>{await api('/api/perfil','POST',{capa:await img2url(fc.files[0],1280,.8)});lista()},'Capa atualizada.');
+ L.append(capa,h('div',{class:'perf'},h('div',{onclick:()=>fa.click(),style:'cursor:pointer',title:'Trocar foto'},av(p.foto_mid?'/api/midia/'+p.foto_mid:p.foto_mini,p.nome)),
+  h('div',{class:'linha',style:'padding-bottom:.3rem'},h('button',{class:'peq',onclick:()=>fa.click()},'Foto'),h('button',{class:'peq',onclick:()=>fc.click()},'Capa'),
+   h('button',{class:'peq perigo',onclick:()=>tenta(async()=>{await api('/api/perfil','POST',{remover_foto:true});lista()})},'Tirar foto'))),fa,fc,
+  h('label',{},'Nome'),nome,h('label',{},'Sobrenome'),sob,h('label',{},'Biografia'),bio,
+  h('label',{class:'linha',style:'color:inherit'},vis,'Aparecer na busca de pessoas (só nome, sobrenome e foto pequena)'),
+  h('p',{},h('button',{class:'pri',onclick:()=>tenta(async()=>{await api('/api/perfil','POST',{nome:nome.value,sobrenome:sob.value,bio:bio.value,visivel:vis.checked});lista()},'Perfil salvo.')},'Salvar perfil')),
+  h('div',{class:'sec'},'Minha chave (passe para quem quiser falar com você)'),
+  h('div',{class:'mono caixa'},p.addr),h('button',{onclick:()=>copiar(p.addr)},'Copiar chave'),
+  h('div',{class:'sec'},'Rede'),
+  h('div',{class:'suave',style:'font-size:.85rem'},['Sem conexão com a rede Tox','Conectado por TCP','Conectado por UDP (direto)'][est.rede]+' · '+est.conectados+' pares conectados · '+est.nos_tox+' nós Tox salvos'+(est.relay_tcp?' · relay TCP '+est.relay_tcp:'')),
+  h('div',{class:'linha',style:'margin:.5rem 0'},h('button',{onclick:()=>tenta(async()=>{const r=await api('/api/nos/atualizar','POST',{});aviso(r.novos+' nós novos.')})},'Atualizar nós (precisa de internet)'),
+   h('button',{onclick:redeAvancada},'Adicionar nó manualmente'),h('button',{onclick:dados},'Exportar / importar')),
+  h('div',{class:'sec'},'Sessão'),h('button',{class:'perigo',onclick:async()=>{await tenta(()=>api('/api/logout','POST',{}));location='/'}},'Sair da conta'))}
+function redeAvancada(){const ip=h('input',{placeholder:'IP (ex.: 192.168.0.20)'}),po=h('input',{type:'number',placeholder:'Porta UDP (ex.: 33445)'}),ch=h('input',{placeholder:'Chave pública do nó (64 caracteres)'}),tc=h('input',{type:'number',placeholder:'Porta TCP (opcional)'});
+ modal('Adicionar nó',false,h('p',{class:'suave'},'Use quando a internet cair: informe o IP de outro computador com RRFS Social ou Tox na sua rede ou numa rota que você alcance.'),
+  h('label',{},'IP'),ip,h('label',{},'Porta'),po,h('label',{},'Chave pública'),ch,h('label',{},'Porta TCP'),tc,
+  h('p',{},h('button',{class:'pri',onclick:()=>tenta(async()=>{await api('/api/rede/no_manual','POST',{ip:ip.value,porta:po.value,chave:ch.value,tcp:tc.value});fechar()},'Nó adicionado.')},'Adicionar')))}
+function dados(){const sel=new Set(['rede','nos']),arq=h('input',{type:'file',accept:'.json,application/json'});
+ const cx=[['rede','Diretório de pessoas e endereços conhecidos'],['nos','Nós públicos do Tox']].map(([k,n])=>h('label',{class:'linha',style:'color:inherit'},h('input',{type:'checkbox',style:'width:auto',checked:true,onchange:e=>e.target.checked?sel.add(k):sel.delete(k)}),n));
+ modal('Exportar e importar',false,h('p',{class:'suave'},'Guarde estes dados num pendrive. Quem entrar na rede no futuro importa o arquivo e se conecta mesmo sem internet. Suas mensagens e chaves privadas nunca vão no arquivo.'),
+  ...cx,h('p',{},h('button',{class:'pri',onclick:()=>{location='/api/exportar?cats='+[...sel].join(',')}},'Baixar arquivo')),
+  h('div',{class:'sec'},'Importar'),arq,h('p',{},h('button',{class:'pri',onclick:()=>tenta(async()=>{const f=arq.files[0];if(!f)throw new Error('Escolha um arquivo.');
+   const r=await api('/api/importar','POST',{conteudo:JSON.parse(await f.text()),categorias:[...sel]});aviso('Importado: '+JSON.stringify(r.resultado));fechar()})},'Importar')))}
+
+/* ── eventos em tempo real ── */
+async function eventos(){while(true){try{const r=await api('/api/eventos?desde='+evN);evN=r.n;
+ if(r.eventos.length){const t=new Set(r.eventos.map(e=>e.tipo));
+  if(t.has('msg')){if(r.eventos.some(e=>e.cid===cid)){carregar();if(!document.hidden)api('/api/lido','POST',{cid})}}
+  if(!$('#fundo-m')&&(t.has('msg')&&aba==='conversas'||t.has('pedido')&&aba==='contatos'||t.has('contato')&&aba==='contatos'||(t.has('grupo')||t.has('convite'))&&aba==='grupos'||t.has('status')&&aba==='status'))lista();else topo()}}
+ catch(e){if(e.message==='login')return;await sleep(3000)}}}
+lista();eventos();setInterval(()=>{if(!document.hidden){topo();if(cid)carregar()}},8000);
+</script>
+</body>
+</html>

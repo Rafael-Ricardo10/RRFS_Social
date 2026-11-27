@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Entretenimento · RRFS Social</title>
+<style>
+:root{--fundo:#0e1418;--painel:#161e24;--painel2:#1c262d;--campo:#0f161b;--tinta:#e4eaee;--suave:#8a9aa6;--linha:#26323b;--cor:#3aa6d8;--cor-t:#06151d;--ok:#5cc489;--erro:#f2877f;--vivo:#e5484d}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fundo);color:var(--tinta);font:15px/1.45 system-ui,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+input,select,textarea{width:100%;padding:.5rem .7rem;background:var(--campo);border:1px solid var(--linha);border-radius:6px}
+textarea{resize:vertical;min-height:4rem}
+button{cursor:pointer;padding:.45rem .85rem;border-radius:6px;border:1px solid var(--linha);background:var(--painel2)}
+button.pri{background:var(--cor);color:var(--cor-t);border-color:var(--cor);font-weight:600}
+button.on{border-color:var(--cor);color:var(--cor)}
+button.perigo{color:var(--erro)}button.peq{padding:.2rem .55rem;font-size:.85rem}
+button:disabled{opacity:.5}
+:focus-visible{outline:2px solid var(--cor);outline-offset:2px}
+a{color:var(--cor)}h2,h3{margin:0;font-weight:600}
+label{display:block;font-size:.82rem;color:var(--suave);margin:.7rem 0 .25rem}
+.suave{color:var(--suave)}.erro{color:var(--erro)}.ok{color:var(--ok)}
+.linha{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}.cresce{flex:1;min-width:0}
+.mono{font-family:ui-monospace,Consolas,monospace;font-size:.78rem;word-break:break-all}
+[hidden]{display:none!important}
+header{position:sticky;top:0;z-index:10;display:flex;gap:.6rem;align-items:center;padding:.6rem 1rem;background:var(--painel);border-bottom:1px solid var(--linha)}
+header .busca{flex:1;display:flex;gap:.4rem;max-width:38rem;margin:0 auto}
+main{max-width:84rem;margin:0 auto;padding:1rem}
+.sec{margin:1.2rem 0 .6rem;display:flex;align-items:center;gap:.6rem}
+.grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:1rem}
+.card{cursor:pointer;min-width:0}
+.th{aspect-ratio:16/9;background:linear-gradient(135deg,#17445a,#3b3a5c);border-radius:8px;position:relative;overflow:hidden}
+.th img{width:100%;height:100%;object-fit:cover;display:block}
+.dur{position:absolute;right:.35rem;bottom:.35rem;background:#000b;color:#fff;font-size:.75rem;padding:0 .35rem;border-radius:4px}
+.dur.vivo{background:var(--vivo);font-weight:700}
+.card h3{font-size:.95rem;margin:.45rem 0 .15rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .meta{font-size:.8rem;color:var(--suave)}
+.av{width:2.2rem;height:2.2rem;border-radius:50%;flex:none;background:#2a4352;display:grid;place-items:center;font-weight:700;overflow:hidden}
+.av img{width:100%;height:100%;object-fit:cover}.av.g{width:4.5rem;height:4.5rem;font-size:1.6rem;border:3px solid var(--fundo)}
+.cx{background:var(--painel);border:1px solid var(--linha);border-radius:8px;padding:.8rem 1rem;margin:0 0 .8rem}
+.chip{display:inline-block;background:var(--painel2);border:1px solid var(--linha);border-radius:99px;padding:0 .6rem;font-size:.78rem;margin:.1rem .2rem .1rem 0}
+.vid{display:grid;grid-template-columns:minmax(0,1fr) 22rem;gap:1.2rem}
+.player{background:#000;border-radius:10px;overflow:hidden;aspect-ratio:16/9;display:grid}
+.player video{width:100%;height:100%;background:#000}
+.player .msg{place-self:center;color:var(--suave);padding:1rem;text-align:center}
+.barra{height:4px;background:var(--linha);border-radius:2px;margin:.3rem 0}.barra i{display:block;height:100%;background:var(--cor);border-radius:2px}
+.com{display:flex;gap:.6rem;margin:.7rem 0}.com .t{min-width:0;flex:1}.com b{font-size:.85rem}.com .tx{white-space:pre-wrap;overflow-wrap:anywhere}
+.capa{height:9rem;border-radius:10px;background:linear-gradient(120deg,#17445a,#3b3a5c) center/cover}
+#fundo-m{position:fixed;inset:0;background:#000a;display:grid;place-items:center;z-index:20;padding:1rem}
+#mod{background:var(--painel);border:1px solid var(--linha);border-radius:10px;width:min(30rem,100%);max-height:90vh;overflow:auto;padding:1rem}
+.toast{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:var(--tinta);color:var(--fundo);padding:.55rem 1rem;border-radius:8px;z-index:30;max-width:90vw}
+.livepane{display:grid;grid-template-columns:minmax(0,1fr) 20rem;gap:1rem}
+@media(max-width:900px){.vid,.livepane{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+ <button onclick="location='/'">‹ Mensagens</button>
+ <b style="cursor:pointer" onclick="go('')">Entretenimento</b>
+ <form class="busca" id="f-busca"><input id="q" placeholder="Buscar vídeos ou canais" autocomplete="off"><button class="pri">Buscar</button></form>
+ <button onclick="go('inscricoes')">Inscrições</button>
+ <button onclick="go('estudio')" title="Configurar canal">⚙ Meu canal</button>
+</header>
+<main id="m"></main>
+<script>
+const $=s=>document.querySelector(s);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function h(t,a,...k){const e=document.createElement(t);for(const[n,v]of Object.entries(a||{})){
+ if(n==='class')e.className=v;else if(n.startsWith('on'))e.addEventListener(n.slice(2),v);
+ else if(n==='value')e.value=v;else if(v!==false&&v!=null)e.setAttribute(n,v===true?'':v)}
+ for(const c of k.flat()){if(c==null||c===false)continue;e.append(c.nodeType?c:document.createTextNode(String(c)))}return e}
+async function api(p,m='GET',b){const o={method:m,headers:{'X-RRFS':'1'}};
+ if(b instanceof FormData)o.body=b;else if(b!==undefined){o.headers['Content-Type']='application/json';o.body=JSON.stringify(b)}
+ const r=await fetch(p,o);let j={};try{j=await r.json()}catch(e){}
+ if(r.status===401){location='/';throw new Error('login')}
+ if(!r.ok)throw new Error(j.erro||('Erro '+r.status));return j}
+function aviso(t,ruim){const e=h('div',{class:'toast',role:'status'},t);document.body.append(e);setTimeout(()=>e.remove(),ruim?6000:2800)}
+async function tenta(fn,ok){try{const r=await fn();if(ok)aviso(ok);return r}catch(e){if(e.message!=='login')aviso(e.message,true)}}
+function fechar(){const f=$('#fundo-m');if(f)f.remove()}
+function modal(t,...c){fechar();const f=h('div',{id:'fundo-m',onclick:e=>{if(e.target===f)fechar()}},h('div',{id:'mod'},
+ h('div',{class:'linha',style:'margin-bottom:.6rem'},h('h2',{class:'cresce'},t),h('button',{class:'peq',onclick:fechar},'Fechar')),...c));document.body.append(f)}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')fechar()});
+const dur=s=>{s=Math.round(s||0);const hh=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return(hh?hh+':'+String(m).padStart(2,'0'):m)+':'+String(x).padStart(2,'0')};
+const ago=ts=>{const s=Date.now()/1000-ts;if(s<90)return'agora há pouco';if(s<3600)return'há '+Math.round(s/60)+' min';if(s<86400)return'há '+Math.round(s/3600)+' h';if(s<2592000)return'há '+Math.round(s/86400)+' dias';return new Date(ts*1000).toLocaleDateString()};
+const num=n=>n==null?null:n>=1e6?(n/1e6).toFixed(1)+' mi':n>=1e3?(n/1e3).toFixed(1)+' mil':String(n);
+const tam=n=>n>1073741824?(n/1073741824).toFixed(1)+' GB':n>1048576?(n/1048576).toFixed(1)+' MB':Math.round(n/1024)+' KB';
+function av(mini,nome,g){const a=h('div',{class:'av'+(g?' g':'')});if(mini)a.append(h('img',{src:mini,alt:''}));else a.append((nome||'?').slice(0,1).toUpperCase());return a}
+function img2url(file,mw,mh,q,quad){return new Promise((res,rej)=>{const i=new Image(),u=URL.createObjectURL(file);i.onload=()=>{
+ let sx=0,sy=0,sw=i.width,sh=i.height,w,hh;
+ if(quad){const m=Math.min(sw,sh);sx=(sw-m)/2;sy=(sh-m)/2;sw=sh=m;w=hh=mw}else if(mh){const r=mw/mh;let nw=sw,nh=sw/r;if(nh>sh){nh=sh;nw=sh*r}sx=(sw-nw)/2;sy=(sh-nh)/2;sw=nw;sh=nh;w=mw;hh=mh}else{const k=Math.min(1,mw/Math.max(sw,sh));w=Math.round(sw*k);hh=Math.round(sh*k)}
+ const c=document.createElement('canvas');c.width=w;c.height=hh;c.getContext('2d').drawImage(i,sx,sy,sw,sh,0,0,w,hh);URL.revokeObjectURL(u);res(c.toDataURL('image/jpeg',q))};
+ i.onerror=()=>rej(new Error('Imagem inválida.'));i.src=u})}
+
+/* ── roteamento ── */
+let limpa=[];function aoSair(f){limpa.push(f)}
+function go(r){location.hash=r}
+async function render(){limpa.forEach(f=>{try{f()}catch(e){}});limpa=[];fechar();
+ const r=decodeURIComponent(location.hash.slice(1)),M=$('#m');M.replaceChildren(h('p',{class:'suave'},'Carregando…'));
+ try{if(r.startsWith('v='))await pgVideo(M,r.slice(2));else if(r.startsWith('c='))await pgCanal(M,r.slice(2));
+  else if(r.startsWith('b='))await pgBusca(M,r.slice(2));else if(r==='estudio')await pgEstudio(M);
+  else if(r==='inscricoes')await pgInsc(M);else await pgInicio(M)}
+ catch(e){if(e.message!=='login')M.replaceChildren(h('p',{class:'erro'},e.message),h('button',{onclick:()=>go('')},'Voltar ao início'))}}
+window.addEventListener('hashchange',render);
+$('#f-busca').onsubmit=e=>{e.preventDefault();const q=$('#q').value.trim();if(q)go('b='+q)};
+
+/* ── cartões ── */
+function card(v){const th=h('div',{class:'th'});if(v.thumb)th.append(h('img',{src:v.thumb,alt:'',loading:'lazy'}));
+ th.append(v.live?h('span',{class:'dur vivo'},'AO VIVO'):v.dur?h('span',{class:'dur'},dur(v.dur)):null);
+ const meta=[v.canal,num(v.vis)!=null?num(v.vis)+' visualizações':null,ago(v.ts)].filter(Boolean).join(' · ');
+ return h('div',{class:'card',onclick:()=>go('v='+v.vid)},th,h('h3',{},v.titulo),h('div',{class:'meta'},meta))}
+const grade=l=>h('div',{class:'grade'},l.map(card));
+function secao(t,l){return l&&l.length?[h('div',{class:'sec'},h('h2',{},t)),grade(l)]:[]}
+
+/* ── início ── */
+async function pgInicio(M){const d=await api('/api/ent/inicio');
+ const tudo=d.ao_vivo.length+d.em_alta.length+d.recentes.length+d.recomendados.length+d.inscricoes.length;
+ M.replaceChildren(...secao('Ao vivo agora',d.ao_vivo),...secao('Recomendados para você',d.recomendados),...secao('Das suas inscrições',d.inscricoes),
+  ...secao('Em alta',d.em_alta),...secao('Recentes',d.recentes),
+  tudo?null:h('div',{class:'cx'},h('h3',{},'Ainda não há vídeos conhecidos'),
+   h('p',{class:'suave'},'O catálogo é montado pela rede: conforme você se conecta a outros usuários, canais e vídeos aparecem aqui. Conhecidos: '+d.catalogo.canais+' canais, '+d.catalogo.videos+' vídeos.'),
+   d.meu_canal?null:h('button',{class:'pri',onclick:()=>go('estudio')},'Criar o meu canal')));
+ const t=setInterval(()=>{if(!document.hidden&&!location.hash)render()},20000);aoSair(()=>clearInterval(t))}
+async function pgBusca(M,q){$('#q').value=q;M.replaceChildren(h('p',{class:'suave'},'Buscando na rede…'));
+ const d=await api('/api/ent/buscar?q='+encodeURIComponent(q));
+ M.replaceChildren(h('p',{class:'suave'},d.consultados+' pares consultados'),
+  d.canais.length?h('div',{class:'sec'},h('h2',{},'Canais')):null,...d.canais.map(canalLinha),
+  ...secao('Vídeos',d.videos),(!d.canais.length&&!d.videos.length)?h('p',{},'Nada encontrado para “'+q+'”.'):null)}
+function canalLinha(c){return h('div',{class:'cx linha',style:'cursor:pointer',onclick:()=>go('c='+c.cid)},av(c.foto_mini,c.nome),
+ h('div',{class:'cresce'},h('b',{},c.nome),h('div',{class:'suave',style:'font-size:.85rem'},c.desc),c.cats.map(x=>h('span',{class:'chip'},x))),
+ h('button',{class:'peq'+(c.inscrito?' on':' pri'),onclick:e=>{e.stopPropagation();inscrever(c,e.target)}},c.inscrito?'Inscrito':'Inscrever-se'))}
+async function inscrever(c,btn){const on=!c.inscrito;if(await tenta(()=>api('/api/ent/inscrever','POST',{cid:c.cid,on}))===undefined)return;c.inscrito=on;
+ btn.textContent=on?'Inscrito':'Inscrever-se';btn.classList.toggle('on',on);btn.classList.toggle('pri',!on)}
+async function pgInsc(M){const d=await api('/api/ent/inscricoes');
+ M.replaceChildren(h('h2',{},'Canais em que você está inscrito'),...(d.canais.length?d.canais.map(canalLinha):[h('p',{class:'suave'},'Você ainda não se inscreveu em nenhum canal.')]))}
+
+/* ── canal ── */
+async function pgCanal(M,cid){const d=await api('/api/ent/canal/'+cid),c=d.canal;
+ const capa=h('div',{class:'capa'});if(d.capa)capa.style.backgroundImage='url('+d.capa+')';
+ const cc={cid,inscrito:d.inscrito};
+ const btn=d.sou_dono?h('button',{class:'pri',onclick:()=>go('estudio')},'Gerenciar canal'):h('button',{class:'pri'+(d.inscrito?' on':'')},d.inscrito?'Inscrito':'Inscrever-se');
+ if(!d.sou_dono)btn.onclick=()=>inscrever(cc,btn);
+ M.replaceChildren(capa,h('div',{class:'linha',style:'margin:-2rem 0 0 1rem'},av(d.avatar,c.nome,true),
+  h('div',{class:'cresce',style:'padding-top:2rem'},h('h2',{},c.nome),h('div',{class:'suave'},(d.inscritos!=null?num(d.inscritos)+' inscritos · ':'')+d.videos.length+' vídeos')),h('div',{style:'padding-top:2rem'},btn)),
+  h('p',{style:'white-space:pre-wrap'},c.desc),h('div',{},c.cats.map(x=>h('span',{class:'chip'},x))),
+  ...secao('Vídeos',d.videos),d.videos.length?null:h('p',{class:'suave'},'Nenhum vídeo ainda (ou o dono está offline e ainda não sincronizou).'));
+ const t=setTimeout(()=>{if(location.hash==='#c='+cid)render()},6000);aoSair(()=>clearTimeout(t))}
+
+/* ── vídeo ── */
+async function pgVideo(M,vid){const info=await api('/api/ent/video/'+vid+'/abrir','POST'),v=info.video;
+ const palco=h('div',{class:'player'},h('div',{class:'msg'},'Procurando fontes…'));
+ const barra=h('i',{style:'width:0'}),status=h('div',{class:'suave',style:'font-size:.8rem'});
+ const gos=h('button',{},'👍 0'),nao=h('button',{},'👎 0'),insc=h('button',{class:'pri'},'Inscrever-se'),lista=h('div'),box=h('textarea',{placeholder:'Adicionar comentário…',maxlength:1000,rows:2});
+ let soc={meu:0},ativo=true;aoSair(()=>{ativo=false});
+ const lado=h('div');
+ const desc=h('div',{class:'cx',style:'white-space:pre-wrap'},h('b',{},(v.vis!=null?num(v.vis)+' visualizações · ':'')+ago(v.ts)),'\n',info.desc||'',h('div',{},v.cats.map(x=>h('span',{class:'chip'},x))));
+ M.replaceChildren(h('div',{class:'vid'},h('div',{},palco,h('div',{class:'barra'},barra),status,
+  h('h2',{style:'margin:.5rem 0'},v.titulo),
+  h('div',{class:'linha'},h('div',{class:'linha',style:'cursor:pointer',onclick:()=>go('c='+v.cid)},av(v.canal_mini,v.canal),h('b',{},v.canal)),
+   v.meu?null:insc,h('span',{class:'cresce'}),gos,nao,h('button',{onclick:()=>compartilhar(v)},'Compartilhar')),desc,
+  h('h3',{style:'margin:1rem 0 .4rem'},h('span',{id:'ncom'},'Comentários')),box,h('div',{style:'margin:.4rem 0'},h('button',{class:'pri peq',onclick:()=>tenta(async()=>{await api('/api/ent/video/'+vid+'/comentar','POST',{texto:box.value});box.value='';atualiza()})},'Comentar')),lista),lado));
+ api('/api/ent/inicio').then(d=>lado.replaceChildren(h('h3',{style:'margin-bottom:.5rem'},'Recomendados'),...[...d.recomendados,...d.em_alta,...d.recentes].filter((x,i,a)=>x.vid!==vid&&a.findIndex(y=>y.vid===x.vid)===i).slice(0,8).map(x=>h('div',{style:'margin-bottom:.8rem'},card(x)))));
+ api('/api/ent/canal/'+v.cid).then(c=>{insc.textContent=c.inscrito?'Inscrito':'Inscrever-se';insc.classList.toggle('on',c.inscrito);const o={cid:v.cid,inscrito:c.inscrito};insc.onclick=()=>inscrever(o,insc)}).catch(()=>{});
+ const votar=n=>tenta(async()=>{const novo=soc.meu===n?0:n;await api('/api/ent/video/'+vid+'/voto','POST',{v:novo});atualiza()});
+ gos.onclick=()=>votar(1);nao.onclick=()=>votar(-1);
+ async function atualiza(){if(!ativo)return;let d;try{d=await api('/api/ent/video/'+vid+'/social')}catch(e){return}soc=d;
+  gos.textContent='👍 '+d.gos;nao.textContent='👎 '+d.nao;gos.classList.toggle('on',d.meu>0);nao.classList.toggle('on',d.meu<0);
+  const n=$('#ncom');if(n)n.textContent=(d.total||d.coms.length)+' comentários';
+  lista.replaceChildren(...[...d.coms].reverse().map(c=>h('div',{class:'com'},av('',c.nome),h('div',{class:'t'},
+   h('b',{},c.nome+(c.dono?' (dono do canal)':'')),' ',h('span',{class:'suave',style:'font-size:.75rem'},ago(c.ts)),h('div',{class:'tx'},c.texto),
+   h('div',{class:'linha'},h('button',{class:'peq'+(c.meu?' on':''),onclick:()=>tenta(async()=>{await api('/api/ent/video/'+vid+'/comentario/'+c.id+'/voto','POST',{on:!c.meu});atualiza()})},'👍 '+c.gos),
+    (c.meu_com||d.sou_dono)?h('button',{class:'peq perigo',onclick:()=>tenta(async()=>{await api('/api/ent/video/'+vid+'/comentario/'+c.id,'DELETE');atualiza()})},'Apagar'):null,
+    (d.sou_dono&&c.pub&&c.pub!==undefined&&!c.meu_com)?h('button',{class:'peq perigo',onclick:()=>{if(confirm('Bloquear '+c.nome+'? Ele não verá mais o seu canal nem os vídeos.'))tenta(async()=>{await api('/api/ent/bloquear','POST',{pub:c.pub,on:true});atualiza()},'Usuário bloqueado.')}},'Bloquear'):null)))))}
+ atualiza();const ti=setInterval(()=>{if(!document.hidden)atualiza()},info.live?3000:7000);aoSair(()=>clearInterval(ti));
+ if(info.live)return tocarLive(palco,vid,info,status,barra);
+ /* VOD */
+ let montado=false;
+ const t2=setInterval(async()=>{if(!ativo)return;let e;try{e=await api('/api/ent/video/'+vid+'/estado')}catch(x){return}
+  if(e.pronto&&!montado){montado=true;
+   if(e.seg){palco.replaceChildren(h('video',{controls:true,autoplay:true,playsinline:true}));mse(palco.firstChild,vid,e.mime,false,()=>ativo)}
+   else palco.replaceChildren(h('video',{src:'/api/ent/video/'+vid+'/stream',controls:true,autoplay:true,playsinline:true}))}
+  if(!e.pronto)palco.firstChild.textContent=e.fonte_online?'Obtendo informações do vídeo…':'Procurando fontes… (o dono e quem já assistiu estão offline?)';
+  if(e.pecas){barra.style.width=Math.round(100*e.tem/e.pecas)+'%';status.textContent=e.completo?'Vídeo salvo no cache deste computador ('+tam(e.tam)+').':'Baixando enquanto reproduz: '+Math.round(100*e.tem/e.pecas)+'% de '+tam(e.tam)}
+  if(e.completo&&montado)clearInterval(t2)},1500);aoSair(()=>clearInterval(t2))}
+
+/* reprodução por segmentos (lives e replays de lives) via MediaSource */
+async function mse(el,vid,mime,live,vivo){
+ if(!window.MediaSource||!MediaSource.isTypeSupported(mime)){el.replaceWith(h('div',{class:'msg'},'Este navegador não reproduz WebM por MediaSource (ex.: Safari/iOS). Use Chrome, Edge ou Firefox.'));return}
+ const ms=new MediaSource();el.src=URL.createObjectURL(ms);await new Promise(r=>ms.addEventListener('sourceopen',r,{once:true}));
+ const sb=ms.addSourceBuffer(mime);sb.mode='sequence';const fila=[];
+ const bomba=()=>{if(sb.updating||ms.readyState!=='open')return;
+  if(fila.length){try{sb.appendBuffer(fila.shift())}catch(e){}return}
+  if(live&&sb.buffered.length&&el.currentTime-sb.buffered.start(0)>45){try{sb.remove(0,el.currentTime-20)}catch(e){}}};
+ sb.addEventListener('updateend',bomba);
+ let prox=live?null:0,vazio=0;
+ while(vivo()){
+  while(fila.length>3&&vivo())await sleep(300);
+  if(!vivo())break;
+  try{
+   if(live){const e=await api('/api/ent/live/'+vid+'/estado');
+    if(prox===null){if(e.pos==null){await sleep(800);continue}prox=e.pos}
+    if(prox>e.ultimo){if(e.fim){break}await sleep(700);continue}}
+   const r=await fetch('/api/ent/video/'+vid+'/peca/'+prox,{headers:{'X-RRFS':'1'}});
+   if(r.status===404||(!live&&r.status===416)){break}
+   if(!r.ok){await sleep(1500);continue}
+   fila.push(await r.arrayBuffer());bomba();prox++;
+   if(el.paused&&el.readyState>=2)el.play().catch(()=>{})
+  }catch(e){await sleep(1500)}
+  if(!live&&prox>=1e6)break}
+ const fimOk=setInterval(()=>{if(!sb.updating&&!fila.length){clearInterval(fimOk);try{if(ms.readyState==='open')ms.endOfStream()}catch(e){}}},400)}
+async function tocarLive(palco,vid,info,status,barra){let ativo=true;aoSair(()=>{ativo=false});
+ const el=h('video',{controls:true,autoplay:true,playsinline:true,muted:true});palco.replaceChildren(el);
+ const e0=await tenta(()=>api('/api/ent/live/'+vid+'/entrar','POST'));
+ const t=setInterval(async()=>{if(!ativo)return;try{const e=await api('/api/ent/live/'+vid+'/estado');
+  status.textContent=e.fim?'A transmissão terminou.':(e.dono_online?'● AO VIVO · ':'Aguardando o dono · ')+e.espectadores+' assistindo (você troca pedaços com eles, o que acelera a transmissão)'}catch(x){}},2500);aoSair(()=>clearInterval(t));
+ mse(el,vid,info.mime_live||'video/webm; codecs="vp8,opus"',true,()=>ativo);
+ barra.parentElement.hidden=true}
+async function compartilhar(v){const [c,g]=await Promise.all([api('/api/contatos'),api('/api/grupos')]);
+ const dest=[...c.contatos.filter(x=>x.estado==='ativo').map(x=>({cid:'p:'+x.pub,nome:(x.nome+' '+x.sobrenome).trim(),tipo:'contato'})),
+  ...g.grupos.filter(x=>x.estado==='ativo').map(x=>({cid:'g:'+x.gid,nome:x.nome,tipo:'grupo'}))];
+ modal('Compartilhar “'+v.titulo+'”',...(dest.length?dest.map(d=>h('div',{class:'linha',style:'padding:.3rem 0'},h('span',{class:'cresce'},d.nome+' · '+d.tipo),
+  h('button',{class:'pri peq',onclick:e=>tenta(async()=>{await api('/api/ent/compartilhar','POST',{cid:d.cid,vid:v.vid});e.target.disabled=true;e.target.textContent='Enviado'})},'Enviar'))):[h('p',{class:'suave'},'Adicione contatos ou grupos para compartilhar.')]))}
+
+/* ── estúdio (meu canal) ── */
+let CATS=[];
+async function pgEstudio(M){const [d,cc]=await Promise.all([api('/api/ent/meu_canal'),api('/api/ent/categorias')]);CATS=cc.categorias;const c=d.canal;
+ const nome=h('input',{value:c?c.nome:'',maxlength:60}),desc=h('textarea',{maxlength:600},c?c.desc:''),sel=new Set(c?c.cats:[]);
+ const fa=h('input',{type:'file',accept:'image/*'}),fc=h('input',{type:'file',accept:'image/*'});
+ const chips=()=>h('div',{},CATS.map(x=>h('label',{class:'chip',style:'cursor:pointer;color:inherit;display:inline-block'},h('input',{type:'checkbox',style:'width:auto;margin-right:.3rem',checked:sel.has(x)||null,
+  onchange:e=>{if(e.target.checked){if(sel.size>=5){e.target.checked=false;aviso('Máximo de 5 interesses.',true)}else sel.add(x)}else sel.delete(x)}}),x)));
+ const salvar=()=>tenta(async()=>{const b={nome:nome.value,desc:desc.value,cats:[...sel]};
+  if(fa.files[0]){b.foto=await img2url(fa.files[0],512,0,.85);b.foto_mini=await img2url(fa.files[0],64,0,.6,true)}
+  if(fc.files[0])b.capa=await img2url(fc.files[0],1280,320,.75);
+  await api('/api/ent/meu_canal','POST',b);render()},'Canal salvo.');
+ const blocos=[h('div',{class:'cx'},h('h2',{},c?'Configurações do canal':'Criar o seu canal'),
+  h('label',{},'Nome do canal'),nome,h('label',{},'Descrição / biografia'),desc,
+  h('label',{},'Estilo do canal (interesses, até 5) — a rede usa isto para recomendar'),chips(),
+  h('label',{},'Foto do canal'),fa,h('label',{},'Foto de capa'),fc,
+  h('p',{},h('button',{class:'pri',onclick:salvar},c?'Salvar':'Criar canal'),c?h('button',{style:'margin-left:.5rem',onclick:()=>go('c='+c.cid)},'Ver página do canal'):null),
+  c?h('p',{class:'suave',style:'font-size:.82rem'},c.inscritos+' inscritos · '+c.videos+' vídeos · '+c.bloqueados+' bloqueados'):null)];
+ if(c){blocos.push(uploadBloco(),liveBloco(d),h('div',{class:'cx'},h('h2',{},'Meus vídeos'),...(d.videos.length?d.videos.map(v=>h('div',{class:'linha',style:'padding:.4rem 0;border-bottom:1px solid var(--linha)'},
+   h('div',{style:'width:7rem'},card(v)),h('div',{class:'cresce suave'},(v.live?'AO VIVO · ':'')+(v.vis!=null?num(v.vis)+' visualizações · ':'')+(v.gos!=null?num(v.gos)+' 👍':'')),
+   h('button',{class:'perigo peq',onclick:()=>{if(confirm('Excluir “'+v.titulo+'”? Some do seu canal e dos caches.'))tenta(async()=>{await api('/api/ent/video/'+v.vid,'DELETE');render()},'Vídeo excluído.')}},'Excluir'))):[h('p',{class:'suave'},'Nenhum vídeo ainda.')])),
+  bloqBloco(d),h('div',{class:'cx suave',style:'font-size:.85rem'},'Cache de vídeos de outros canais: '+tam(cc.cache.usado)+' de '+tam(cc.cache.limite)+' ('+cc.cache.pct+'% do disco). Quando enche, os vídeos mais antigos saem. Os vídeos do seu canal não entram nesse limite.'))}
+ M.replaceChildren(...blocos)}
+function bloqBloco(d){const k=h('input',{placeholder:'Chave pública (64 caracteres) de quem bloquear'});
+ return h('div',{class:'cx'},h('h2',{},'Usuários bloqueados'),h('p',{class:'suave',style:'font-size:.85rem'},'Quem você bloqueia não vê o canal nem os vídeos (novos e antigos) e não pode comentar. Você também pode bloquear direto pelos comentários.'),
+  ...d.bloqueados.map(b=>h('div',{class:'linha'},h('span',{class:'cresce'},b.nome+' · '+b.pub.slice(0,8)),h('button',{class:'peq',onclick:()=>tenta(async()=>{await api('/api/ent/bloquear','POST',{pub:b.pub,on:false});render()})},'Desbloquear'))),
+  h('div',{class:'linha',style:'margin-top:.5rem'},h('div',{class:'cresce'},k),h('button',{onclick:()=>tenta(async()=>{await api('/api/ent/bloquear','POST',{pub:k.value.trim(),on:true});render()},'Bloqueado.')},'Bloquear')))}
+function uploadBloco(){const f=h('input',{type:'file',accept:'video/mp4,video/webm'}),tit=h('input',{maxlength:100}),des=h('textarea',{maxlength:1000}),sel=new Set(),prog=h('div',{class:'suave'}),btn=h('button',{class:'pri'},'Publicar vídeo');
+ const chips=h('div',{},CATS.map(x=>h('label',{class:'chip',style:'cursor:pointer;color:inherit;display:inline-block'},h('input',{type:'checkbox',style:'width:auto;margin-right:.3rem',onchange:e=>{e.target.checked?sel.add(x):sel.delete(x)}}),x)));
+ f.onchange=()=>{if(f.files[0]&&!tit.value)tit.value=f.files[0].name.replace(/\.[^.]+$/,'')};
+ btn.onclick=async()=>{const a=f.files[0];if(!a)return aviso('Escolha um vídeo.',true);btn.disabled=true;prog.textContent='Preparando…';
+  try{const {duracao,thumb}=await meta(a);const fd=new FormData();fd.append('arquivo',a);fd.append('titulo',tit.value);fd.append('desc',des.value);fd.append('cats',[...sel].join(','));fd.append('dur',duracao);fd.append('thumb',thumb);
+   await new Promise((ok,err)=>{const x=new XMLHttpRequest();x.open('POST','/api/ent/video/enviar');x.setRequestHeader('X-RRFS','1');
+    x.upload.onprogress=e=>{if(e.lengthComputable)prog.textContent='Enviando '+Math.round(100*e.loaded/e.total)+'% de '+tam(e.total)};
+    x.onload=()=>{let j={};try{j=JSON.parse(x.responseText)}catch(e){}x.status<300?ok():err(new Error(j.erro||'Falha no envio'))};x.onerror=()=>err(new Error('Falha de conexão'));x.send(fd)});
+   aviso('Vídeo publicado.');render()}catch(e){aviso(e.message,true);prog.textContent='';btn.disabled=false}};
+ return h('div',{class:'cx'},h('h2',{},'Enviar vídeo'),h('p',{class:'suave',style:'font-size:.85rem'},'MP4 ou WebM, sem limite de tamanho: o seu computador é o servidor do vídeo. Mantenha-o ligado para outras pessoas assistirem; quem já assistiu ajuda a distribuir.'),
+  f,h('label',{},'Título'),tit,h('label',{},'Descrição'),des,h('label',{},'Categorias (até 5)'),chips,h('p',{},btn),prog)}
+function meta(file){return new Promise(res=>{const v=document.createElement('video'),u=URL.createObjectURL(file);v.muted=true;v.preload='metadata';
+ const fim=(d,t)=>{URL.revokeObjectURL(u);res({duracao:d||0,thumb:t||''})};
+ v.onerror=()=>fim(0,'');v.onloadedmetadata=()=>{v.currentTime=Math.min(1,(v.duration||2)/2)};
+ v.onseeked=()=>{try{const c=document.createElement('canvas');c.width=192;c.height=108;c.getContext('2d').drawImage(v,0,0,192,108);fim(v.duration,c.toDataURL('image/jpeg',.5))}catch(e){fim(v.duration,'')}};v.src=u;setTimeout(()=>fim(0,''),8000)})}
+
+/* live: câmera/microfone no navegador, ou OBS/Studio por RTMP */
+function liveBloco(d){const tit=h('input',{maxlength:100,placeholder:'Título da live'}),des=h('input',{maxlength:1000,placeholder:'Descrição'}),prev=h('video',{muted:true,playsinline:true,style:'width:100%;max-height:18rem;background:#000;border-radius:8px',hidden:true}),
+  st=h('div',{class:'suave'}),bC=h('button',{class:'pri'},'Iniciar com câmera e microfone'),bO=h('button',{},'Usar OBS / aplicativo de estúdio'),bF=h('button',{class:'perigo',hidden:true},'Encerrar live'),info=h('div',{class:'mono'});
+ let vid=null,stream=null,ativo=false,fila=Promise.resolve(),nseg=0;
+ const enviaSeg=(blob,dur)=>{fila=fila.then(()=>fetch('/api/ent/live/'+vid+'/segmento?dur='+dur,{method:'POST',headers:{'X-RRFS':'1'},body:blob}).then(r=>{if(r.ok){nseg++;st.textContent='● NO AR · '+nseg+' segmentos enviados'}}).catch(()=>{}))};
+ const criar=async(mime,thumb)=>{const r=await api('/api/ent/live/iniciar','POST',{titulo:tit.value,desc:des.value,cats:d.canal.cats,mime,thumb});vid=r.vid;bF.hidden=false;bC.disabled=bO.disabled=true;return r.vid};
+ bC.onclick=()=>tenta(async()=>{if(!tit.value.trim())throw new Error('Dê um título à live.');
+  const mime='video/webm;codecs=vp8,opus';if(!window.MediaRecorder||!MediaRecorder.isTypeSupported(mime))throw new Error('Este navegador não grava WebM VP8. Use Chrome, Edge ou Firefox.');
+  stream=await navigator.mediaDevices.getUserMedia({video:{width:1280,height:720},audio:true});prev.hidden=false;prev.srcObject=stream;prev.play();await sleep(800);
+  let thumb='';try{const c=document.createElement('canvas');c.width=192;c.height=108;c.getContext('2d').drawImage(prev,0,0,192,108);thumb=c.toDataURL('image/jpeg',.5)}catch(e){}
+  await criar('video/webm; codecs="vp8,opus"',thumb);ativo=true;st.textContent='Iniciando…';
+  (async()=>{while(ativo){const rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:2500000}),ch=[];rec.ondataavailable=e=>e.data.size&&ch.push(e.data);
+   const fim=new Promise(r=>rec.onstop=r);rec.start();await sleep(4000);rec.stop();await fim;if(ch.length)enviaSeg(new Blob(ch,{type:'video/webm'}),4)}})()});
+ bO.onclick=()=>tenta(async()=>{if(!tit.value.trim())throw new Error('Dê um título à live.');await criar('video/webm; codecs="vp8,opus"','');
+  const r=await api('/api/ent/live/'+vid+'/rtmp','POST',{});info.textContent='No OBS: Configurações > Transmissão > Serviço “Personalizado”. Servidor: '+r.servidor+'   Chave: '+r.chave+'   (inicie a transmissão no OBS depois)';st.textContent='Aguardando o OBS conectar… (precisa do ffmpeg instalado)'});
+ bF.onclick=()=>tenta(async()=>{ativo=false;if(stream)stream.getTracks().forEach(t=>t.stop());await fila;await api('/api/ent/live/'+vid+'/encerrar','POST',{});aviso('Live encerrada. Ela fica salva como vídeo.');render()});
+ aoSair(()=>{if(vid&&ativo){ativo=false;if(stream)stream.getTracks().forEach(t=>t.stop());fetch('/api/ent/live/'+vid+'/encerrar',{method:'POST',headers:{'X-RRFS':'1'},keepalive:true})}});
+ return h('div',{class:'cx'},h('h2',{},'Transmissão ao vivo'),h('p',{class:'suave',style:'font-size:.85rem'},'Quanto mais gente assiste, mais fontes existem: os espectadores repassam os pedaços uns aos outros. A live fica salva no seu computador e no cache de quem assistiu.'),
+  tit,h('div',{style:'height:.4rem'}),des,h('div',{class:'linha',style:'margin:.6rem 0'},bC,bO,bF),prev,st,info)}
+render();
+</script>
+</body>
+</html>
